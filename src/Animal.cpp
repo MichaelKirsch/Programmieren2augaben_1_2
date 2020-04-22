@@ -12,12 +12,15 @@ Animal::~Animal() {
 
 void Animal::render() {
     RenderAble::render();
+    std::cout << "Animal " << m_name<< " render" << std::endl;
 }
 
 bool Animal::init() {
     RenderAble::init();
+
 }
 
 void Animal::update() {
     RenderAble::update();
+    std::cout << "Animal " << m_name<< " update" << std::endl;
 }

@@ -10,7 +10,6 @@ public:
     const std::string& getName(){return m_name;};
     bool init() override; //method is empty
     void update()override;
-
     void render() override;
 
 private:
