@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 
 //RenderAble is a virtual class. You will need virtual classes if you want to make sure that all the classes that
@@ -8,9 +9,13 @@
 class RenderAble {
 public:
     RenderAble() = default;
+
     virtual ~RenderAble() = default;
+
     virtual void update();
+
     virtual bool init();
+
     virtual void render();
 };
 
