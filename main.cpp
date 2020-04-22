@@ -1,7 +1,8 @@
 #include <iostream>
-#include "src/Animal.h"
 #include <memory>
 #include <vector>
+
+#include "src/Animal.h"
 #include "src/Dragon.h"
 #include "src/Dog.h"
 
@@ -40,9 +41,15 @@ int main() {
                 break;
         }
     }
-
+    for (auto &rend:allRenderableObjects) {
+        //all the animal methods are sliced off. only base render and base update will be displayed
+        rend.update();
+        rend.render();
+    }
 
     //here without slicing:
+
+    std::vector<RenderAble*> pointersOfRenderable;
 
     std::vector<Dog> noslicedDogs;
     for (int x = 0; x < 10; x++) {
@@ -53,17 +60,23 @@ int main() {
     for (auto &single_dog:noslicedDogs) {
         single_dog.bark(); //method not sliced off
         single_dog.update(); //this will call the base and the animal update
-        allRenderableObjects.emplace_back(
-                single_dog); //lets downcast it to let it be updated with all the other objects
+        pointersOfRenderable.emplace_back(
+                &single_dog); //lets downcast it to let it be updated with all the other objects
         //when we downcast the dog methods will again be sliced off in the renderable objects, but will be accessable in the
         //dog-vector
     }
 
-
-    for (auto &rend:allRenderableObjects) {
-        //all the animal methods are sliced off. only base render and base update will be displayed
-        rend.update();
-        rend.render();
+    for(auto& point:pointersOfRenderable)
+    {
+        point->update();
+        auto cast = dynamic_cast<Dog*>(point); //you can upcast from a pointer
+        if(cast!=NULL)
+        {
+            cast->bark();
+        }
     }
+
+
+
     return 0;
 }
