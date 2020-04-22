@@ -4,6 +4,9 @@
 #include <vector>
 #include "src/Dragon.h"
 #include "src/Dog.h"
+
+//hier die erklärung warum using namespace std keine gute idee ist:
+//https://www.geeksforgeeks.org/using-namespace-std-considered-bad-practice/
 int main() {
 
     auto lokalesAnimal = Animal("Lokales Animal (main scope)",1); //auto keyword is just taking the return value of the function that is assigned
@@ -13,7 +16,7 @@ int main() {
         auto heapDog = std::make_unique<Dog>("Franz der lokale head Hund", 1, dogtypes::maddog, 3);
         heapDog->bark();
         lokalerDrache.feuerspeien();
-        //they are in a lokal scope. unique pointer will call delete when the scope is left
+        //they are in a local scope. unique pointer will call delete when the scope is left
     }
 
 
