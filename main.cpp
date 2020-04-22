@@ -62,8 +62,6 @@ int main() {
         single_dog.update(); //this will call the base and the animal update
         pointersOfRenderable.emplace_back(
                 &single_dog); //lets downcast it to let it be updated with all the other objects
-        //when we downcast the dog methods will again be sliced off in the renderable objects, but will be accessable in the
-        //dog-vector
     }
 
     for(auto& point:pointersOfRenderable)
