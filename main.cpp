@@ -44,11 +44,30 @@ int main() {
     }
 
 
-    for(auto rend:allRenderableObjects)
+    //here without slicing:
+
+    std::vector<Dog> noslicedDogs;
+    for(int x =0;x<10;x++)
     {
+        noslicedDogs.emplace_back(Dog("Unsliced dog "+std::to_string(x),x,dogtypes::underdog,x));
+    }
+    noslicedDogs.shrink_to_fit();
+
+    for(auto& single_dog:noslicedDogs)
+    {
+        single_dog.bark(); //method not sliced off
+        single_dog.update(); //this will call the base and the animal update
+        allRenderableObjects.emplace_back(single_dog); //lets downcast it to let it be updated with all the other objects
+        //when we downcast the dog methods will again be sliced off in the renderable objects, but will be accessable in the
+        //dog-vector
+    }
+
+
+    for(auto& rend:allRenderableObjects)
+    {
+        //all the animal methods are sliced off. only base render and base update will be displayed
         rend.update();
         rend.render();
     }
-
     return 0;
 }
