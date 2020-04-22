@@ -15,5 +15,5 @@ Dragon::~Dragon() {
 }
 
 void Dragon::feuerspeien() {
-    std::cout << "Dracke " << Animal::getName() << " Speit Feuer in der Farbe " << m_feuerfarbe<< std::endl;
+    std::cout << "Dragon " << Animal::getName() << " spits fire with color " << m_feuerfarbe<< std::endl;
 }
