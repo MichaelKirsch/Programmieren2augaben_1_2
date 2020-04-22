@@ -6,12 +6,13 @@
 #include "src/Dog.h"
 int main() {
 
-    auto lokalesAnimal = Animal("vogel",1); //auto keyword is just taking the return value of the function that is assigned
-    auto heapAnimal = std::make_unique<Animal>("thomas",2); //make unique can be used instead of new
+    auto lokalesAnimal = Animal("Lokales Animal (main scope)",1); //auto keyword is just taking the return value of the function that is assigned
+    auto heapAnimal = std::make_unique<Animal>("Heap Animal (main scope)",2); //make unique can be used instead of new
     {
-        auto lokalerDrache = Dragon("holger",1,4);
-        auto heapDog = std::make_unique<Dog>("franz", 1, dogtypes::maddog, 3);
+        auto lokalerDrache = Dragon("Holger der lokale Drache",1,4);
+        auto heapDog = std::make_unique<Dog>("Franz der lokale head Hund", 1, dogtypes::maddog, 3);
         heapDog->bark();
+        lokalerDrache.feuerspeien();
         //they are in a lokal scope. unique pointer will call delete when the scope is left
     }
 
@@ -46,7 +47,5 @@ int main() {
         rend.render();
     }
 
-    lokalerDrache.feuerspeien();
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }
