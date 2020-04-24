@@ -2,79 +2,84 @@
 #include <memory>
 #include <vector>
 
+#include "src/basics.h"
 #include "src/Animal.h"
 #include "src/Dragon.h"
 #include "src/Dog.h"
 
-//hier die erklärung warum using namespace std keine gute idee ist:
-//https://www.geeksforgeeks.org/using-namespace-std-considered-bad-practice/
+//ich verwende hier kein using namespace std wegen name pollution
 int main() {
+    //basics entspricht der aufgabe aus der vorlesung
+    {
+        //das auto keyword nimmt immer automatisch den objekttyp der rückgabe an. Hier: basics
+        auto lokalesBasic = basics("hallo", 10); //lokales objekt auf dem stack
+        auto heapBasics = new basics("peter",30); //opjekt wird auf dem heap erstellt.
+        //aufgrund des begrenzten stack platzes ist es ratsam objekte auf dem heap auszulagern
+        //dies kann man mit new oder mit einem smart pointer erreichen. ein erstellen auf dem heap
+        //gibt immer einen pointer zurück
 
-    auto lokalesAnimal = Animal("Lokales Animal (main scope)",
-                                1); //auto keyword is just taking the return value of the function that is assigned
-    auto heapAnimal = std::make_unique<Animal>("Heap Animal (main scope)", 2); //make unique can be used instead of new
+        //abrufen der methoden
+        lokalesBasic.init(1);
+        lokalesBasic.update();
+        //abrufen der methoden über den pointer
+        heapBasics->update();
+        heapBasics->init(1);
+
+        //zerstören der objekte, lokales muss nicht zerstört werden da es zerstört wird
+        //wenn man ein objekt mit einem unique_ptr erstellt dann wird dieses auch zerstört wenn es den scope
+        //verlässt
+        //wenn der scope endet
+
+        delete heapBasics; //löschen des objekts aus dem heap über den pointer
+    }
+
+
+    //aufgabe 2 mit animal und den erbenden hunden und drachen
+
+    //das auto keyword nimmt automatisch den wert der Rückgabe an. In diesem Fall Animal
+    auto lokalesAnimal = Animal("Nicht spezialisiertes Tier Stack",1);
+
+    //erstellen auf dem heap mithilfe eines std::unique_ptr<Animal>
+    auto heapAnimal = std::make_unique<Animal>("Nicht spezialisiertes Tier Heap", 2);
+
     {
         auto lokalerDrache = Dragon("Holger der lokale Drache", 1, 4);
+        //lokales erstellen
         auto heapDog = std::make_unique<Dog>("Franz der lokale head Hund", 1, dogtypes::maddog, 3);
+        //wieder erstellen auf dem heap
         heapDog->bark();
         lokalerDrache.feuerspeien();
-        //they are in a local scope. unique pointer will call delete when the scope is left
+       // beide objekte werden automatisch zerstört wenn sie den scope verlassen
     }
 
+    std::vector<RenderAble*> pointersOfRenderable; //erstellen eines containers mit RenderAble*
 
-    std::vector<RenderAble> allRenderableObjects;
-    allRenderableObjects.resize(10); //always resize your vector to save space and copytime, as the
-    //vector will have to be copied everytime it grows. but when you resize before, enough space will be reserved
     for (int x = 0; x < 10; x++) {
-        int random = rand() % 4;
-        switch (random) {
-            //watch out: here we have slicing. When you create a Dog in a vector of Renderable, it will cut off the dog
-            //specific methods. When you want to have multiple dogs you need a vector of dogs and you can update all animals
-            //by having a big vector with pointers of renderable things. that way you dont have slicing
-            case 0:
-                allRenderableObjects.emplace_back(Dog("DOG" + std::to_string(x), x, dogtypes::underdog, x));
-                //there will be some destroyed objects visible in the log. These are only the temporary obejcts that get created
-                //when you construct in place
-                break;
-            default:
-                allRenderableObjects.emplace_back(Dragon("DRAGON" + std::to_string(x), x, x));
-                break;
-        }
-    }
-    for (auto &rend:allRenderableObjects) {
-        //all the animal methods are sliced off. only base render and base update will be displayed
-        rend.update();
-        rend.render();
-    }
-
-    //here without slicing:
-
-    std::vector<RenderAble*> pointersOfRenderable;
-
-    std::vector<Dog> noslicedDogs;
-    for (int x = 0; x < 10; x++) {
-        noslicedDogs.emplace_back(Dog("Unsliced dog " + std::to_string(x), x, dogtypes::underdog, x));
-    }
-    noslicedDogs.shrink_to_fit();
-
-    for (auto &single_dog:noslicedDogs) {
-        single_dog.bark(); //method not sliced off
-        single_dog.update(); //this will call the base and the animal update
-        pointersOfRenderable.emplace_back(
-                &single_dog); //lets downcast it to let it be updated with all the other objects
+        //füllen des vectors mit 20 pointern zu heap objekten vom Typ Drache und Hund
+        pointersOfRenderable.emplace_back(new Dragon("Drache "+ std::to_string(x),x,x));
+        pointersOfRenderable.emplace_back(new Dog("Hund " + std::to_string(x), x, dogtypes::underdog, x));
     }
 
     for(auto& point:pointersOfRenderable)
     {
+        //aufrufen der methoden die alle durch die Erbung von Renderable haben
         point->update();
-        auto cast = dynamic_cast<Dog*>(point); //you can upcast from a pointer
-        if(cast!=NULL)
+        point->update();
+        auto cast = dynamic_cast<Dog*>(point); //dynamischer cast zurück auf den hund
+        if(cast!=NULL) // schauen ob der cast okay war
         {
-            cast->bark();
+            cast->bark(); // member methode von Hund aufrufen
+        }
+        auto drache = dynamic_cast<Dragon*>(point);
+        if(drache!=NULL)
+        {
+            drache->feuerspeien(); //wieder aufruf der membermethode
         }
     }
 
-
+    for(auto& member:pointersOfRenderable)
+        delete member; //alle objekte löschen
 
     return 0;
+    //oben erzeugte objekte gehen jetzt out of scope und werden zerstört
 }
