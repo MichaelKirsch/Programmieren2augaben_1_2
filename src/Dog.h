@@ -20,7 +20,6 @@ public:
 private:
     dogtypes m_type = dogtypes::default_dog;
     int m_bark_volume = -1;
-    //
 };
 
 
